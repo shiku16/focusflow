@@ -126,7 +126,7 @@ class _PlannerScreenState extends State<PlannerScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
-                        Expanded(
+                        Flexible(
                           child: Text(
                             row.subject,
                             maxLines: 1,

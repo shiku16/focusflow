@@ -88,16 +88,11 @@ class _CoachScreenState extends State<CoachScreen> {
                     ),
                   ),
                   const SizedBox(height: 10),
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      for (final String prompt in _suggestions)
-                        Padding(
-                          padding: EdgeInsets.only(right: 6),
-                          child: _suggestionChip(context, scheme, prompt),
-                        ),
-                    ],
-                  ),
+                  for (final String prompt in _suggestions)
+                    Padding(
+                      padding: EdgeInsets.only(bottom: 8),
+                      child: _suggestionChip(context, scheme, prompt),
+                    ),
                   const SizedBox(height: 24),
                 ],
               ),
@@ -120,7 +115,7 @@ class _CoachScreenState extends State<CoachScreen> {
             onPressed: () => widget.onNavigate(FocusPage.home),
           ),
           const SizedBox(width: 12),
-          Expanded(
+          Flexible(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
@@ -231,7 +226,7 @@ Widget _bubble(BuildContext context, ColorScheme scheme, _Message message) {
         padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
         child: Row(
           children: <Widget>[
-            Expanded(
+            Flexible(
               child: TextField(
                 controller: _input,
                 maxLines: 1,

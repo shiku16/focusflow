@@ -23,11 +23,13 @@ class ProfileScreen extends StatelessWidget {
         const SizedBox(height: 24),
         _profileCard(context, scheme),
         const SizedBox(height: 18),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            _statCard(context, scheme, 'Exam Goal', 'SSC CGL 2027'),
-            const SizedBox(width: 12),
+            Padding(
+              padding: EdgeInsets.only(bottom: 10),
+              child: _statCard(context, scheme, 'Exam Goal', 'SSC CGL 2027'),
+            ),
             _statCard(context, scheme, 'Daily Target', '3 hrs / day'),
           ],
         ),
@@ -95,7 +97,7 @@ Widget _profileCard(BuildContext context, ColorScheme scheme) {
               ),
             ),
             const SizedBox(width: 16),
-            Expanded(
+            Flexible(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
@@ -135,41 +137,37 @@ Widget _profileCard(BuildContext context, ColorScheme scheme) {
     String label,
     String value,
   ) {
-    return Expanded(
-      child: Card.filled(
-        margin: EdgeInsets.zero,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(18)),
-        ),
-        child: SizedBox.expand(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text(
-                  label,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: scheme.onSurfaceVariant,
-                    fontSize: 12.5,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  value,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: scheme.onSurface,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ],
+    return Card.filled(
+      margin: EdgeInsets.zero,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(18)),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: scheme.onSurfaceVariant,
+                fontSize: 12.5,
+              ),
             ),
-          ),
+            const SizedBox(height: 4),
+            Text(
+              value,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: scheme.onSurface,
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -181,26 +179,25 @@ Widget _profileCard(BuildContext context, ColorScheme scheme) {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.all(Radius.circular(16)),
       ),
-      child: SizedBox.expand(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 14, 14, 14),
-          child: Row(
-            children: <Widget>[
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: scheme.primaryContainer,
-                  borderRadius: BorderRadius.all(Radius.circular(12)),
-                ),
-                child: Center(
-                  child: Icon(row.icon, color: scheme.primary, size: 20),
-                ),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 14, 14, 14),
+        child: Row(
+          children: <Widget>[
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: scheme.primaryContainer,
+                borderRadius: BorderRadius.all(Radius.circular(12)),
               ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Text(
-                  row.label,
+              child: Center(
+                child: Icon(row.icon, color: scheme.primary, size: 20),
+              ),
+            ),
+            const SizedBox(width: 14),
+            Flexible(
+              child: Text(
+                row.label,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
@@ -219,8 +216,7 @@ Widget _profileCard(BuildContext context, ColorScheme scheme) {
             ],
           ),
         ),
-      ),
-    );
+      );
   }
 
   Widget _sectionTitle(BuildContext context, String title) {

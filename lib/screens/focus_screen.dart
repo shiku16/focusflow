@@ -117,15 +117,13 @@ class _FocusScreenState extends State<FocusScreen> {
           ),
         ),
         const SizedBox(height: 28),
-        SizedBox.expand(
-          child: FilledButton(
-            onPressed: _toggleSession,
-            child: Text(
-              _inSession ? 'End Session' : 'Start',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w700,
-              ),
+        FilledButton(
+          onPressed: _toggleSession,
+          child: Text(
+            _inSession ? 'End Session' : 'Start',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
             ),
           ),
         ),

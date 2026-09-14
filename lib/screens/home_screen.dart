@@ -130,29 +130,27 @@ Widget _greeting(BuildContext context, ColorScheme scheme) {
           ),
         ),
         const SizedBox(width: 16),
-        Flexible(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Text(
-                'Good morning, Udit 👋',
-                style: TextStyle(
-                  color: scheme.onSurface,
-                  fontSize: 22,
-                  fontWeight: FontWeight.w800,
-                ),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Text(
+              'Good morning, Udit 👋',
+              style: TextStyle(
+                color: scheme.onSurface,
+                fontSize: 22,
+                fontWeight: FontWeight.w800,
               ),
-              const SizedBox(height: 5),
-              Text(
-                "Let's make today count.",
-                style: TextStyle(
-                  color: scheme.onSurfaceVariant,
-                  fontSize: 15,
-                  fontWeight: FontWeight.w500,
-                ),
+            ),
+            const SizedBox(height: 5),
+            Text(
+              "Let's make today count.",
+              style: TextStyle(
+                color: scheme.onSurfaceVariant,
+                fontSize: 15,
+                fontWeight: FontWeight.w500,
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ],
     );
