@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../theme/app_theme.dart';
+
 /// A soft card summarizing today's study progress.
 ///
 /// Keeps a positive, encouraging tone — it simply reports how much of the
@@ -30,7 +32,7 @@ class TodayProgressCard extends StatelessWidget {
     return Card.filled(
       margin: EdgeInsets.zero,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.circular(20)),
+        borderRadius: BorderRadius.all(FocusFlowTheme.radiusM),
       ),
       child: Padding(
         padding: const EdgeInsets.fromLTRB(20, 18, 20, 20),
@@ -61,10 +63,7 @@ class TodayProgressCard extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               '$completed of $total tasks completed',
-              style: TextStyle(
-                color: scheme.onSurfaceVariant,
-                fontSize: 14,
-              ),
+              style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 14),
             ),
             const SizedBox(height: 18),
             ClipRRect(

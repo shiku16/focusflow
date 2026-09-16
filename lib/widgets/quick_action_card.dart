@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../theme/app_theme.dart';
+
 /// A full-width, tappable quick-action card shown on the Home screen.
 ///
 /// [accent] cards use the primary color for emphasis (e.g. "Start Focus");
@@ -34,15 +36,13 @@ class QuickActionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final ColorScheme scheme = Theme.of(context).colorScheme;
     final Color foreground = accent ? scheme.onPrimary : scheme.primary;
-    final Color chipColor = accent
-        ? Colors.white12
-        : scheme.primaryContainer;
+    final Color chipColor = accent ? Colors.white12 : scheme.primaryContainer;
     return Card(
       elevation: accent ? 1 : 0,
       color: accent ? scheme.primary : scheme.surfaceContainerHigh,
       margin: EdgeInsets.zero,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.circular(18)),
+        borderRadius: BorderRadius.all(FocusFlowTheme.radiusM),
       ),
       child: GestureDetector(
         onTap: onTap,
@@ -60,7 +60,7 @@ class QuickActionCard extends StatelessWidget {
                     height: 40,
                     decoration: BoxDecoration(
                       color: chipColor,
-                      borderRadius: BorderRadius.all(Radius.circular(12)),
+                      borderRadius: BorderRadius.all(FocusFlowTheme.radiusS),
                     ),
                     child: Center(
                       child: Icon(icon, color: foreground, size: 22),

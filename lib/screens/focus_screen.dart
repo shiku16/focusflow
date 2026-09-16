@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../theme/app_theme.dart';
+
 /// A simple focus-session screen.
 ///
 /// This shows the session UI (timer display, current task, start action)
@@ -34,7 +36,7 @@ class _FocusScreenState extends State<FocusScreen> {
           elevation: 2,
           margin: EdgeInsets.zero,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(28)),
+            borderRadius: BorderRadius.all(FocusFlowTheme.radiusXL),
           ),
           child: Padding(
             padding: const EdgeInsets.fromLTRB(24, 32, 24, 32),
@@ -121,10 +123,7 @@ class _FocusScreenState extends State<FocusScreen> {
           onPressed: _toggleSession,
           child: Text(
             _inSession ? 'End Session' : 'Start',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w700,
-            ),
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
           ),
         ),
         const SizedBox(height: 10),
@@ -132,10 +131,7 @@ class _FocusScreenState extends State<FocusScreen> {
           child: Text(
             'Distraction-free focus mode will live here soon.',
             textAlign: TextAlign.center,
-            style: TextStyle(
-              color: scheme.onSurfaceVariant,
-              fontSize: 13,
-            ),
+            style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 13),
           ),
         ),
       ],
@@ -148,19 +144,16 @@ class _FocusScreenState extends State<FocusScreen> {
       children: <Widget>[
         Text(
           'Focus Session',
-          style: TextStyle(
-            color: scheme.onSurface,
-            fontSize: 26,
-            fontWeight: FontWeight.w800,
-          ),
+          style: Theme.of(
+            context,
+          ).textTheme.headlineMedium?.copyWith(color: scheme.onSurface),
         ),
         const SizedBox(height: 4),
         Text(
           'Deep work, one task at a time',
-          style: TextStyle(
-            color: scheme.onSurfaceVariant,
-            fontSize: 15,
-          ),
+          style: Theme.of(
+            context,
+          ).textTheme.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
         ),
       ],
     );

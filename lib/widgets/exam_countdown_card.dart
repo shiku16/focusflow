@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../theme/app_theme.dart';
+
 /// A premium highlight card showing the user's next big exam and a
 /// prominent countdown.
 ///
@@ -31,7 +33,7 @@ class ExamCountdownCard extends StatelessWidget {
       color: scheme.primary,
       margin: EdgeInsets.zero,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.circular(24)),
+        borderRadius: BorderRadius.all(FocusFlowTheme.radiusL),
       ),
       child: Padding(
         padding: const EdgeInsets.fromLTRB(20, 20, 20, 22),
@@ -46,7 +48,7 @@ class ExamCountdownCard extends StatelessWidget {
                   height: 44,
                   decoration: BoxDecoration(
                     color: Colors.white12,
-                    borderRadius: BorderRadius.all(Radius.circular(14)),
+                    borderRadius: BorderRadius.all(FocusFlowTheme.radiusS),
                   ),
                   child: Icon(
                     Icons.calendar_month,
@@ -74,10 +76,7 @@ class ExamCountdownCard extends StatelessWidget {
                         subtitle,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          color: Colors.white70,
-                          fontSize: 13,
-                        ),
+                        style: TextStyle(color: Colors.white70, fontSize: 13),
                       ),
                     ],
                   ),

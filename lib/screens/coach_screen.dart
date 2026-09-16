@@ -11,10 +11,7 @@ class CoachScreen extends StatefulWidget {
   /// Creates the Coach screen.
   ///
   /// [onNavigate] is used to return to the Home screen via the back button.
-  const CoachScreen({
-    super.key,
-    required this.onNavigate,
-  });
+  const CoachScreen({super.key, required this.onNavigate});
 
   /// Called to switch to another page (used by the back button).
   final void Function(FocusPage) onNavigate;
@@ -31,7 +28,8 @@ class _CoachScreenState extends State<CoachScreen> {
   final List<_Message> _messages = <_Message>[
     _Message(
       fromCoach: true,
-      text: "Hi Udit! 👋 I'm your AI study coach. Ask me to plan your day, "
+      text:
+          "Hi Udit! 👋 I'm your AI study coach. Ask me to plan your day, "
           'help you recover, or quiz you on a topic.',
     ),
   ];
@@ -52,14 +50,16 @@ class _CoachScreenState extends State<CoachScreen> {
       _messages.add(
         _Message(
           fromCoach: true,
-          text: "Got it — I'd love to help. Full coaching is coming soon. "
+          text:
+              "Got it — I'd love to help. Full coaching is coming soon. "
               'Meanwhile, add this to your planner and start with a focus session.',
         ),
       );
       _input.clear();
     });
   }
-@override
+
+  @override
   Widget build(BuildContext context) {
     final ColorScheme scheme = Theme.of(context).colorScheme;
     return Column(
@@ -121,18 +121,15 @@ class _CoachScreenState extends State<CoachScreen> {
               children: <Widget>[
                 Text(
                   'AI Study Coach',
-                  style: TextStyle(
-                    color: scheme.onSurface,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w800,
-                  ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleLarge?.copyWith(color: scheme.onSurface),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   'Always in your corner',
-                  style: TextStyle(
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: scheme.onSurfaceVariant,
-                    fontSize: 13,
                   ),
                 ),
               ],
@@ -146,23 +143,21 @@ class _CoachScreenState extends State<CoachScreen> {
               borderRadius: BorderRadius.all(Radius.circular(12)),
             ),
             child: Center(
-              child: Icon(
-                Icons.psychology,
-                color: scheme.primary,
-                size: 22,
-              ),
+              child: Icon(Icons.psychology, color: scheme.primary, size: 22),
             ),
           ),
         ],
       ),
     );
   }
-Widget _bubble(BuildContext context, ColorScheme scheme, _Message message) {
+
+  Widget _bubble(BuildContext context, ColorScheme scheme, _Message message) {
     final Color bubbleColor = message.fromCoach
         ? scheme.surfaceContainerHigh
         : scheme.primary;
-    final Color textColor =
-        message.fromCoach ? scheme.onSurface : scheme.onPrimary;
+    final Color textColor = message.fromCoach
+        ? scheme.onSurface
+        : scheme.onPrimary;
     return Align(
       alignment: message.fromCoach
           ? AlignmentDirectional.centerStart
@@ -190,9 +185,8 @@ Widget _bubble(BuildContext context, ColorScheme scheme, _Message message) {
               child: Text(
                 message.text,
                 textAlign: TextAlign.start,
-                style: TextStyle(
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: textColor,
-                  fontSize: 14.5,
                   height: 1.35,
                 ),
               ),
@@ -230,7 +224,9 @@ Widget _bubble(BuildContext context, ColorScheme scheme, _Message message) {
               child: TextField(
                 controller: _input,
                 maxLines: 1,
-                decoration: const InputDecoration(hintText: 'Message the coach…'),
+                decoration: const InputDecoration(
+                  hintText: 'Message the coach…',
+                ),
                 onSubmitted: (String value) => _send(value),
               ),
             ),

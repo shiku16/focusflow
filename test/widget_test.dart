@@ -11,10 +11,19 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:focusflow/main.dart';
 
 void main() {
-  testWidgets('FocusFlow navigates between all screens', (WidgetTester tester) async {
+  testWidgets('FocusFlow navigates between all screens', (
+    WidgetTester tester,
+  ) async {
     // Build the FocusFlow app and trigger a frame.
     await tester.pumpWidget(const FocusFlowApp());
+
+    // The branded launch splash is shown first.
+    expect(find.text('FocusFlow'), findsOneWidget);
+
+    // Let the brief splash finish and reveal the dashboard.
+    await tester.pump(const Duration(milliseconds: 1200));
     await tester.pump();
+    expect(find.text('FocusFlow'), findsNothing);
 
     // The Home dashboard shows the greeting, countdown and plan.
     expect(find.text('Good morning, Udit 👋'), findsOneWidget);

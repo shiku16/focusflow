@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../theme/app_theme.dart';
+
 /// A single row in the "Today's Plan" list with a completion checkbox.
 ///
 /// The parent screen owns the checked state; this card calls [onChanged] with
@@ -37,7 +39,7 @@ class StudyTaskCard extends StatelessWidget {
     return Card.filled(
       margin: EdgeInsets.zero,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.circular(18)),
+        borderRadius: BorderRadius.all(FocusFlowTheme.radiusM),
       ),
       child: Padding(
         padding: const EdgeInsets.fromLTRB(8, 8, 14, 8),
@@ -101,7 +103,7 @@ class StudyTaskCard extends StatelessWidget {
                   margin: EdgeInsets.zero,
                   color: scheme.primaryContainer,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                    borderRadius: BorderRadius.all(FocusFlowTheme.radiusS),
                   ),
                   child: Icon(
                     Icons.check_circle,

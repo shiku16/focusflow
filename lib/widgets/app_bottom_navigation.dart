@@ -44,7 +44,7 @@ class AppBottomNavigation extends StatelessWidget {
           children: <Widget>[
             for (final _NavDestination tab in tabs)
               SizedBox(
-                width: 72,
+                width: 68,
                 child: GestureDetector(
                   behavior: HitTestBehavior.translucent,
                   onTap: tab.page == current

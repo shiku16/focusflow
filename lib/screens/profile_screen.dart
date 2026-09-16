@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../theme/app_theme.dart';
+
 /// A polished profile screen with account details, goal targets, and a
 /// settings-style list.
 class ProfileScreen extends StatelessWidget {
@@ -51,28 +53,26 @@ class ProfileScreen extends StatelessWidget {
       children: <Widget>[
         Text(
           'Profile',
-          style: TextStyle(
-            color: scheme.onSurface,
-            fontSize: 26,
-            fontWeight: FontWeight.w800,
-          ),
+          style: Theme.of(
+            context,
+          ).textTheme.headlineMedium?.copyWith(color: scheme.onSurface),
         ),
         const SizedBox(height: 4),
         Text(
           'Your goals & settings',
-          style: TextStyle(
-            color: scheme.onSurfaceVariant,
-            fontSize: 15,
-          ),
+          style: Theme.of(
+            context,
+          ).textTheme.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
         ),
       ],
     );
   }
-Widget _profileCard(BuildContext context, ColorScheme scheme) {
+
+  Widget _profileCard(BuildContext context, ColorScheme scheme) {
     return Card.filled(
       margin: EdgeInsets.zero,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.circular(22)),
+        borderRadius: BorderRadius.all(FocusFlowTheme.radiusL),
       ),
       child: Padding(
         padding: const EdgeInsets.fromLTRB(18, 18, 18, 18),
@@ -140,7 +140,7 @@ Widget _profileCard(BuildContext context, ColorScheme scheme) {
     return Card.filled(
       margin: EdgeInsets.zero,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.circular(18)),
+        borderRadius: BorderRadius.all(FocusFlowTheme.radiusM),
       ),
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
@@ -151,10 +151,7 @@ Widget _profileCard(BuildContext context, ColorScheme scheme) {
               label,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                color: scheme.onSurfaceVariant,
-                fontSize: 12.5,
-              ),
+              style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 12.5),
             ),
             const SizedBox(height: 4),
             Text(
@@ -173,11 +170,15 @@ Widget _profileCard(BuildContext context, ColorScheme scheme) {
     );
   }
 
-  Widget _settingRow(BuildContext context, ColorScheme scheme, _SettingRow row) {
+  Widget _settingRow(
+    BuildContext context,
+    ColorScheme scheme,
+    _SettingRow row,
+  ) {
     return Card.filled(
       margin: EdgeInsets.zero,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.circular(16)),
+        borderRadius: BorderRadius.all(FocusFlowTheme.radiusM),
       ),
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16, 14, 14, 14),
@@ -188,7 +189,7 @@ Widget _profileCard(BuildContext context, ColorScheme scheme) {
               height: 40,
               decoration: BoxDecoration(
                 color: scheme.primaryContainer,
-                borderRadius: BorderRadius.all(Radius.circular(12)),
+                borderRadius: BorderRadius.all(FocusFlowTheme.radiusS),
               ),
               child: Center(
                 child: Icon(row.icon, color: scheme.primary, size: 20),
@@ -198,34 +199,28 @@ Widget _profileCard(BuildContext context, ColorScheme scheme) {
             Flexible(
               child: Text(
                 row.label,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: scheme.onSurface,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                  ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: scheme.onSurface,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
-              const SizedBox(width: 6),
-              Icon(
-                Icons.arrow_forward,
-                color: scheme.outline,
-                size: 18,
-              ),
-            ],
-          ),
+            ),
+            const SizedBox(width: 6),
+            Icon(Icons.arrow_forward, color: scheme.outline, size: 18),
+          ],
         ),
-      );
+      ),
+    );
   }
 
   Widget _sectionTitle(BuildContext context, String title) {
     return Text(
       title,
-      style: TextStyle(
+      style: Theme.of(context).textTheme.titleLarge?.copyWith(
         color: Theme.of(context).colorScheme.onSurface,
-        fontSize: 18,
-        fontWeight: FontWeight.w800,
       ),
     );
   }

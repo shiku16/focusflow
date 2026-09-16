@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../theme/app_theme.dart';
 import '../widgets/study_task_card.dart';
 
 /// A polished weekly study overview with a day selector and sample tasks.
@@ -80,7 +81,8 @@ class _PlannerScreenState extends State<PlannerScreen> {
       _selectedDay = index;
     });
   }
-@override
+
+  @override
   Widget build(BuildContext context) {
     final ColorScheme scheme = Theme.of(context).colorScheme;
     final List<_StudyTask> tasks = _byDay[_selectedDay];
@@ -90,22 +92,15 @@ class _PlannerScreenState extends State<PlannerScreen> {
         _header(context, scheme),
         const SizedBox(height: 22),
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
             for (int i = 0; i < _days.length; i++)
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 2),
-                child: _dayPill(context, scheme, i),
-              ),
+              Flexible(child: _dayPill(context, scheme, i)),
           ],
         ),
         const SizedBox(height: 10),
         Text(
           '${_dayNames[_selectedDay]} · ${tasks.length} tasks planned',
-          style: TextStyle(
-            color: scheme.onSurfaceVariant,
-            fontSize: 13,
-          ),
+          style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 13),
         ),
         const SizedBox(height: 22),
         _sectionTitle(context, 'Weekly Overview'),
@@ -116,7 +111,7 @@ class _PlannerScreenState extends State<PlannerScreen> {
             child: Card.filled(
               margin: EdgeInsets.zero,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(16)),
+                borderRadius: BorderRadius.all(FocusFlowTheme.radiusM),
               ),
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(16, 12, 16, 14),
@@ -186,19 +181,16 @@ class _PlannerScreenState extends State<PlannerScreen> {
       children: <Widget>[
         Text(
           'Planner',
-          style: TextStyle(
-            color: scheme.onSurface,
-            fontSize: 26,
-            fontWeight: FontWeight.w800,
-          ),
+          style: Theme.of(
+            context,
+          ).textTheme.headlineMedium?.copyWith(color: scheme.onSurface),
         ),
         const SizedBox(height: 4),
         Text(
           'Your weekly study overview',
-          style: TextStyle(
-            color: scheme.onSurfaceVariant,
-            fontSize: 15,
-          ),
+          style: Theme.of(
+            context,
+          ).textTheme.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
         ),
       ],
     );
@@ -209,10 +201,10 @@ class _PlannerScreenState extends State<PlannerScreen> {
     return GestureDetector(
       onTap: selected ? null : () => _selectDay(index),
       child: SizedBox(
-        width: 40,
-        height: 40,
+        width: 32,
+        height: 32,
         child: ClipRRect(
-          borderRadius: BorderRadius.all(Radius.circular(13)),
+          borderRadius: BorderRadius.all(FocusFlowTheme.radiusS),
           child: ColoredBox(
             color: selected ? scheme.primary : Colors.transparent,
             child: Center(
@@ -234,10 +226,8 @@ class _PlannerScreenState extends State<PlannerScreen> {
   Widget _sectionTitle(BuildContext context, String title) {
     return Text(
       title,
-      style: TextStyle(
+      style: Theme.of(context).textTheme.titleLarge?.copyWith(
         color: Theme.of(context).colorScheme.onSurface,
-        fontSize: 18,
-        fontWeight: FontWeight.w800,
       ),
     );
   }

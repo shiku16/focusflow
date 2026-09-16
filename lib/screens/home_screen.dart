@@ -12,10 +12,7 @@ class HomeScreen extends StatefulWidget {
   /// Creates the Home screen.
   ///
   /// [onNavigate] routes the user to another [FocusPage].
-  const HomeScreen({
-    super.key,
-    required this.onNavigate,
-  });
+  const HomeScreen({super.key, required this.onNavigate});
 
   /// Called to switch to another page, e.g. from a quick action.
   final void Function(FocusPage) onNavigate;
@@ -106,7 +103,8 @@ class _HomeScreenState extends State<HomeScreen> {
       ],
     );
   }
-Widget _greeting(BuildContext context, ColorScheme scheme) {
+
+  Widget _greeting(BuildContext context, ColorScheme scheme) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -135,18 +133,16 @@ Widget _greeting(BuildContext context, ColorScheme scheme) {
           children: <Widget>[
             Text(
               'Good morning, Udit 👋',
-              style: TextStyle(
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                 color: scheme.onSurface,
-                fontSize: 22,
                 fontWeight: FontWeight.w800,
               ),
             ),
             const SizedBox(height: 5),
             Text(
               "Let's make today count.",
-              style: TextStyle(
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: scheme.onSurfaceVariant,
-                fontSize: 15,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -159,10 +155,8 @@ Widget _greeting(BuildContext context, ColorScheme scheme) {
   Widget _sectionTitle(BuildContext context, String title) {
     return Text(
       title,
-      style: TextStyle(
+      style: Theme.of(context).textTheme.titleLarge?.copyWith(
         color: Theme.of(context).colorScheme.onSurface,
-        fontSize: 18,
-        fontWeight: FontWeight.w800,
       ),
     );
   }

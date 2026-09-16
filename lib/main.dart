@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart' show Ticker;
 
 import 'focus_page.dart';
 import 'screens/coach_screen.dart';
@@ -8,6 +9,7 @@ import 'screens/planner_screen.dart';
 import 'screens/profile_screen.dart';
 import 'theme/app_theme.dart';
 import 'widgets/app_bottom_navigation.dart';
+import 'widgets/focusflow_splash.dart';
 
 void main() {
   runApp(const FocusFlowApp());
@@ -26,6 +28,7 @@ class FocusFlowApp extends StatelessWidget {
       title: 'FocusFlow',
       themeMode: ThemeMode.light,
       theme: FocusFlowTheme.light(),
+      darkTheme: FocusFlowTheme.dark(),
       debugShowCheckedModeBanner: false,
       home: const FocusFlowShell(),
     );
@@ -44,8 +47,38 @@ class FocusFlowShell extends StatefulWidget {
   State<FocusFlowShell> createState() => _FocusFlowShellState();
 }
 
-class _FocusFlowShellState extends State<FocusFlowShell> {
+class _FocusFlowShellState extends State<FocusFlowShell>
+    with SingleTickerProviderStateMixin {
   FocusPage _page = FocusPage.home;
+
+  /// Whether the branded launch splash is still showing.
+  bool _showSplash = true;
+  Ticker? _splashTicker;
+  Duration _splashElapsed = Duration.zero;
+
+  /// The brief branded launch moment (kept short by design).
+  static const Duration _splashDuration = Duration(milliseconds: 900);
+
+  @override
+  void initState() {
+    super.initState();
+    _splashTicker = createTicker((Duration elapsed) {
+      _splashElapsed += elapsed;
+      if (_splashElapsed >= _splashDuration) {
+        _splashTicker!.stop();
+        setState(() {
+          _showSplash = false;
+        });
+      }
+    });
+    _splashTicker!.start();
+  }
+
+  @override
+  void dispose() {
+    _splashTicker?.stop();
+    super.dispose();
+  }
 
   void _go(FocusPage page) {
     setState(() {
@@ -55,9 +88,11 @@ class _FocusFlowShellState extends State<FocusFlowShell> {
 
   @override
   Widget build(BuildContext context) {
+    if (_showSplash) {
+      return const FocusFlowSplash();
+    }
     final bool showBottomNavigation = _page != FocusPage.coach;
     return Scaffold(
-      backgroundColor: const Color(0xFFF6F6F9),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
@@ -65,7 +100,7 @@ class _FocusFlowShellState extends State<FocusFlowShell> {
             child: showBottomNavigation
                 ? SingleChildScrollView(
                     child: Padding(
-                      padding: const EdgeInsets.fromLTRB(20, 22, 20, 26),
+                      padding: FocusFlowTheme.screenInset,
                       child: _pageWidget(context),
                     ),
                   )
