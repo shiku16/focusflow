@@ -9,11 +9,15 @@ import '../theme/app_theme.dart';
 class TodayProgressCard extends StatelessWidget {
   /// Creates a today-progress card.
   ///
-  /// [completed] and [total] drive the percentage and progress bar shown.
+  /// [completed] and [total] drive the percentage and progress bar shown;
+  /// [completedMinutes] and [totalMinutes] show planned vs completed study
+  /// time.
   const TodayProgressCard({
     super.key,
     required this.completed,
     required this.total,
+    required this.completedMinutes,
+    required this.totalMinutes,
   });
 
   /// Number of study tasks already finished today.
@@ -21,6 +25,12 @@ class TodayProgressCard extends StatelessWidget {
 
   /// Total number of study tasks planned for today.
   final int total;
+
+  /// Study minutes finished today.
+  final int completedMinutes;
+
+  /// Total planned study minutes for today.
+  final int totalMinutes;
 
   /// The percentage (0–100) of tasks completed.
   int get percent => total == 0 ? 0 : (completed * 100 / total).round();
@@ -64,6 +74,10 @@ class TodayProgressCard extends StatelessWidget {
             Text(
               '$completed of $total tasks completed',
               style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 14),
+            ),
+            Text(
+              '$completedMinutes of $totalMinutes min studied',
+              style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 13),
             ),
             const SizedBox(height: 18),
             ClipRRect(

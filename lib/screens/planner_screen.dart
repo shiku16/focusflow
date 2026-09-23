@@ -1,15 +1,23 @@
 import 'package:flutter/material.dart';
 
+import '../app_state.dart';
+import '../study_task.dart';
 import '../theme/app_theme.dart';
 import '../widgets/study_task_card.dart';
 
-/// A polished weekly study overview with a day selector and sample tasks.
+/// A polished weekly study overview with a day selector and study tasks.
 ///
 /// This is a real, interactive screen: tapping a day updates the selected
-/// highlight and the tasks shown below.
+/// highlight and the tasks shown below, which come from the shared app state
+/// (the same data the Home screen uses).
 class PlannerScreen extends StatefulWidget {
   /// Creates the Planner screen.
-  const PlannerScreen({super.key});
+  ///
+  /// [appState] provides the shared study tasks and completion state.
+  const PlannerScreen({super.key, required this.appState});
+
+  /// The shared study data.
+  final FocusFlowAppState appState;
 
   @override
   State<PlannerScreen> createState() => _PlannerScreenState();
@@ -40,41 +48,29 @@ class _PlannerScreenState extends State<PlannerScreen> {
     _WeekRow('General Awareness', 0.35, '3h 00m'),
   ];
 
-  /// Sample tasks for each day of the week.
-  static final List<List<_StudyTask>> _byDay = <List<_StudyTask>>[
-    <_StudyTask>[
-      _StudyTask('Quantitative Aptitude', 'Percentages', '45 min'),
-      _StudyTask('Reasoning', 'Coding Decoding', '40 min'),
-      _StudyTask('English', 'Vocabulary', '30 min'),
-    ],
-    <_StudyTask>[
-      _StudyTask('General Awareness', 'Current Affairs', '30 min'),
-      _StudyTask('Reasoning', 'Syllogisms', '35 min'),
-      _StudyTask('English', 'Idioms & Phrases', '25 min'),
-    ],
-    <_StudyTask>[
-      _StudyTask('Quantitative Aptitude', 'Averages', '40 min'),
-      _StudyTask('General Awareness', 'Geography', '30 min'),
-    ],
-    <_StudyTask>[
-      _StudyTask('English', 'Reading Comprehension', '40 min'),
-      _StudyTask('Reasoning', 'Blood Relations', '35 min'),
-      _StudyTask('Quantitative Aptitude', 'Ratio', '40 min'),
-    ],
-    <_StudyTask>[
-      _StudyTask('General Awareness', 'Polity', '30 min'),
-      _StudyTask('English', 'Grammar', '30 min'),
-    ],
-    <_StudyTask>[
-      _StudyTask('Quantitative Aptitude', 'Percentages', '45 min'),
-      _StudyTask('Reasoning', 'Puzzles', '40 min'),
-    ],
-    <_StudyTask>[
-      _StudyTask('English', 'Vocabulary Revision', '30 min'),
-      _StudyTask('General Awareness', 'Current Affairs', '30 min'),
-      _StudyTask('Reasoning', 'Mock Test Review', '45 min'),
-    ],
-  ];
+  DateTime get _today => DateTime.now();
+
+  /// The current week's date for day index 0 (Monday) and beyond.
+  DateTime _dateFor(int index) =>
+      mondayOfWeek(_today).add(Duration(days: index));
+
+  @override
+  void initState() {
+    super.initState();
+    widget.appState.addListener(_onAppStateChanged);
+  }
+
+  @override
+  void dispose() {
+    widget.appState.removeListener(_onAppStateChanged);
+    super.dispose();
+  }
+
+  void _onAppStateChanged() {
+    if (mounted) {
+      setState(() {});
+    }
+  }
 
   void _selectDay(int index) {
     setState(() {
@@ -85,7 +81,9 @@ class _PlannerScreenState extends State<PlannerScreen> {
   @override
   Widget build(BuildContext context) {
     final ColorScheme scheme = Theme.of(context).colorScheme;
-    final List<_StudyTask> tasks = _byDay[_selectedDay];
+    final List<StudyTask> tasks = widget.appState.tasksForDate(
+      _dateFor(_selectedDay),
+    );
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
@@ -160,17 +158,21 @@ class _PlannerScreenState extends State<PlannerScreen> {
         const SizedBox(height: 22),
         _sectionTitle(context, '${_dayNames[_selectedDay]} · Tasks'),
         const SizedBox(height: 14),
-        for (int i = 0; i < tasks.length; i++)
-          Padding(
-            padding: EdgeInsets.only(bottom: i + 1 == tasks.length ? 0 : 10),
-            child: StudyTaskCard(
-              subject: tasks[i].subject,
-              topic: tasks[i].topic,
-              duration: tasks[i].duration,
-              completed: false,
-              onChanged: (bool value) {},
+        if (tasks.isEmpty)
+          _emptyDayCard(context, scheme)
+        else
+          for (int i = 0; i < tasks.length; i++)
+            Padding(
+              padding: EdgeInsets.only(bottom: i + 1 == tasks.length ? 0 : 10),
+              child: StudyTaskCard(
+                subject: tasks[i].subject,
+                topic: tasks[i].topic,
+                duration: '${tasks[i].durationMinutes} min',
+                completed: tasks[i].completed,
+                onChanged: (bool value) =>
+                    widget.appState.setTaskCompleted(tasks[i].id, value),
+              ),
             ),
-          ),
       ],
     );
   }
@@ -223,6 +225,36 @@ class _PlannerScreenState extends State<PlannerScreen> {
     );
   }
 
+  Widget _emptyDayCard(BuildContext context, ColorScheme scheme) {
+    return Card.filled(
+      margin: EdgeInsets.zero,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(FocusFlowTheme.radiusM),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 18, 16, 18),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Text(
+              'No tasks planned for ${_dayNames[_selectedDay]}',
+              style: TextStyle(
+                color: scheme.onSurface,
+                fontSize: 15,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'Add tasks from Home to build this day’s plan.',
+              style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 13),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _sectionTitle(BuildContext context, String title) {
     return Text(
       title,
@@ -240,13 +272,4 @@ class _WeekRow {
   final String subject;
   final double load;
   final String hours;
-}
-
-/// A description of a study task used inside the Planner.
-class _StudyTask {
-  const _StudyTask(this.subject, this.topic, this.duration);
-
-  final String subject;
-  final String topic;
-  final String duration;
 }

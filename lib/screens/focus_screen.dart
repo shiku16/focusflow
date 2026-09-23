@@ -1,28 +1,75 @@
 import 'package:flutter/material.dart';
 
+import '../app_state.dart';
 import '../theme/app_theme.dart';
 
-/// A simple focus-session screen.
+/// A focus-session screen backed by the shared app state.
 ///
-/// This shows the session UI (timer display, current task, start action)
-/// without implementing a full timer engine yet. The Start button toggles a
-/// lightweight in-session state so the interaction is real.
+/// The countdown itself lives in [FocusFlowAppState], so it keeps running
+/// (or staying paused) when the user navigates to another screen and back.
 class FocusScreen extends StatefulWidget {
   /// Creates the Focus screen.
-  const FocusScreen({super.key});
+  ///
+  /// [appState] owns the session timer state shared across screens.
+  const FocusScreen({super.key, required this.appState});
+
+  /// The shared session state (timer, remaining time, running/paused flags).
+  final FocusFlowAppState appState;
 
   @override
   State<FocusScreen> createState() => _FocusScreenState();
 }
 
 class _FocusScreenState extends State<FocusScreen> {
-  bool _inSession = false;
-
-  void _toggleSession() {
-    setState(() {
-      _inSession = !_inSession;
-    });
+  @override
+  void initState() {
+    super.initState();
+    widget.appState.addListener(_onAppStateChanged);
   }
+
+  @override
+  void dispose() {
+    widget.appState.removeListener(_onAppStateChanged);
+    super.dispose();
+  }
+
+  void _onAppStateChanged() {
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  /// The timer display, formatted as `MM:SS`.
+  String get _formattedTime {
+    final int minutes = widget.appState.remainingSeconds ~/ 60;
+    final int seconds = widget.appState.remainingSeconds % 60;
+    return '${minutes.toString().padLeft(2, '0')}:'
+        '${seconds.toString().padLeft(2, '0')}';
+  }
+
+  String get _statusLabel {
+    if (!widget.appState.focusInSession) {
+      return 'Session ready';
+    }
+    return widget.appState.focusRunning
+        ? 'Session in progress'
+        : 'Session paused';
+  }
+
+  Color _statusColor(ColorScheme scheme) {
+    if (widget.appState.focusRunning) {
+      return scheme.primary;
+    }
+    if (widget.appState.focusInSession) {
+      return scheme.tertiary;
+    }
+    return scheme.outlineVariant;
+  }
+
+  void _startSession() => widget.appState.startFocus();
+  void _pauseSession() => widget.appState.pauseFocus();
+  void _resumeSession() => widget.appState.resumeFocus();
+  void _endSession() => widget.appState.endFocus();
 
   @override
   Widget build(BuildContext context) {
@@ -50,19 +97,15 @@ class _FocusScreenState extends State<FocusScreen> {
                       width: 12,
                       height: 12,
                       decoration: BoxDecoration(
-                        color: _inSession
-                            ? scheme.primary
-                            : scheme.outlineVariant,
+                        color: _statusColor(scheme),
                         shape: BoxShape.circle,
                       ),
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      _inSession ? 'Session in progress' : 'Session ready',
+                      _statusLabel,
                       style: TextStyle(
-                        color: _inSession
-                            ? scheme.primary
-                            : scheme.onSurfaceVariant,
+                        color: _statusColor(scheme),
                         fontSize: 13.5,
                         fontWeight: FontWeight.w600,
                       ),
@@ -75,7 +118,7 @@ class _FocusScreenState extends State<FocusScreen> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: <Widget>[
                       Text(
-                        '25:00',
+                        _formattedTime,
                         style: TextStyle(
                           color: scheme.onSurface,
                           fontSize: 64,
@@ -119,19 +162,53 @@ class _FocusScreenState extends State<FocusScreen> {
           ),
         ),
         const SizedBox(height: 28),
-        FilledButton(
-          onPressed: _toggleSession,
-          child: Text(
-            _inSession ? 'End Session' : 'Start',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
-          ),
-        ),
+        _buildActions(context),
         const SizedBox(height: 10),
         Center(
           child: Text(
             'Distraction-free focus mode will live here soon.',
             textAlign: TextAlign.center,
             style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 13),
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// Renders the primary session actions: Start when idle; Pause or Resume
+  /// plus End Session while a session is active.
+  Widget _buildActions(BuildContext context) {
+    if (!widget.appState.focusInSession) {
+      return FilledButton(
+        onPressed: _startSession,
+        child: Text(
+          'Start',
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+        ),
+      );
+    }
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: <Widget>[
+        Flexible(
+          child: FilledButton(
+            onPressed: widget.appState.focusRunning
+                ? _pauseSession
+                : _resumeSession,
+            child: Text(
+              widget.appState.focusRunning ? 'Pause' : 'Resume',
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+            ),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Flexible(
+          child: FilledButton.tonal(
+            onPressed: _endSession,
+            child: Text(
+              'End Session',
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+            ),
           ),
         ),
       ],

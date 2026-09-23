@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart' show Ticker;
 
+import 'app_state.dart';
 import 'focus_page.dart';
 import 'screens/coach_screen.dart';
 import 'screens/focus_screen.dart';
@@ -51,10 +54,19 @@ class _FocusFlowShellState extends State<FocusFlowShell>
     with SingleTickerProviderStateMixin {
   FocusPage _page = FocusPage.home;
 
+  /// Shared, session-scoped app state injected into screens that need it.
+  final FocusFlowAppState _appState = FocusFlowAppState();
+
+  /// Shared scroll controller for the shell's page area.
+  final ScrollController _scrollController = ScrollController();
+
   /// Whether the branded launch splash is still showing.
   bool _showSplash = true;
   Ticker? _splashTicker;
   Duration _splashElapsed = Duration.zero;
+
+  /// Whether persisted app state has been loaded.
+  bool _readyToShowApp = false;
 
   /// The brief branded launch moment (kept short by design).
   static const Duration _splashDuration = Duration(milliseconds: 900);
@@ -62,9 +74,10 @@ class _FocusFlowShellState extends State<FocusFlowShell>
   @override
   void initState() {
     super.initState();
+    unawaited(_restore());
     _splashTicker = createTicker((Duration elapsed) {
       _splashElapsed += elapsed;
-      if (_splashElapsed >= _splashDuration) {
+      if (_splashElapsed >= _splashDuration && _readyToShowApp) {
         _splashTicker!.stop();
         setState(() {
           _showSplash = false;
@@ -74,9 +87,23 @@ class _FocusFlowShellState extends State<FocusFlowShell>
     _splashTicker!.start();
   }
 
+  /// Loads persisted state. The splash stays up until this completes so the
+  /// dashboard never flashes back to a default state after being restored.
+  Future<void> _restore() async {
+    await _appState.restore();
+    if (!mounted) {
+      return;
+    }
+    setState(() {
+      _readyToShowApp = true;
+    });
+  }
+
   @override
   void dispose() {
     _splashTicker?.stop();
+    _scrollController.dispose();
+    _appState.dispose();
     super.dispose();
   }
 
@@ -84,6 +111,11 @@ class _FocusFlowShellState extends State<FocusFlowShell>
     setState(() {
       _page = page;
     });
+    // Each page should open at the top; the shared scroll position from a
+    // previously scrolled page must not leak into the next screen.
+    if (_scrollController.hasClients) {
+      _scrollController.jumpTo(0);
+    }
   }
 
   @override
@@ -99,6 +131,7 @@ class _FocusFlowShellState extends State<FocusFlowShell>
           Expanded(
             child: showBottomNavigation
                 ? SingleChildScrollView(
+                    controller: _scrollController,
                     child: Padding(
                       padding: FocusFlowTheme.screenInset,
                       child: _pageWidget(context),
@@ -119,13 +152,16 @@ class _FocusFlowShellState extends State<FocusFlowShell>
   Widget _pageWidget(BuildContext context) {
     switch (_page) {
       case FocusPage.home:
-        return HomeScreen(onNavigate: (FocusPage page) => _go(page));
+        return HomeScreen(
+          onNavigate: (FocusPage page) => _go(page),
+          appState: _appState,
+        );
       case FocusPage.planner:
-        return const PlannerScreen();
+        return PlannerScreen(appState: _appState);
       case FocusPage.focus:
-        return const FocusScreen();
+        return FocusScreen(appState: _appState);
       case FocusPage.profile:
-        return const ProfileScreen();
+        return ProfileScreen(appState: _appState);
       case FocusPage.coach:
         return CoachScreen(onNavigate: (FocusPage page) => _go(page));
     }

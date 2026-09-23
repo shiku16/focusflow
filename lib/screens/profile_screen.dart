@@ -1,19 +1,88 @@
 import 'package:flutter/material.dart';
 
+import '../app_state.dart';
 import '../theme/app_theme.dart';
 
-/// A polished profile screen with account details, goal targets, and a
-/// settings-style list.
-class ProfileScreen extends StatelessWidget {
+/// A polished profile screen with editable account details, goal targets,
+/// and a settings-style list.
+class ProfileScreen extends StatefulWidget {
   /// Creates the Profile screen.
-  const ProfileScreen({super.key});
+  ///
+  /// [appState] provides the persisted profile values (name, exam goal, daily
+  /// study target).
+  const ProfileScreen({super.key, required this.appState});
 
+  /// The shared session state.
+  final FocusFlowAppState appState;
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
   static const List<_SettingRow> _settings = <_SettingRow>[
     _SettingRow('Daily study reminders', Icons.notifications),
     _SettingRow('Distraction-free mode', Icons.timer),
     _SettingRow('Coach preferences', Icons.psychology),
     _SettingRow('Help center', Icons.lightbulb),
   ];
+
+  final TextEditingController _nameInput = TextEditingController();
+  final TextEditingController _goalInput = TextEditingController();
+  final TextEditingController _hoursInput = TextEditingController();
+  final TextEditingController _minutesInput = TextEditingController();
+  bool _editing = false;
+  String? _formError;
+
+  FocusFlowAppState get _appState => widget.appState;
+
+  void _openEdit() {
+    _nameInput.text = _appState.userName;
+    _goalInput.text = _appState.examGoal;
+    _hoursInput.text = '${_appState.dailyTargetMinutes ~/ 60}';
+    _minutesInput.text = '${_appState.dailyTargetMinutes % 60}';
+    setState(() {
+      _editing = true;
+      _formError = null;
+    });
+  }
+
+  void _cancelEdit() {
+    setState(() {
+      _editing = false;
+      _formError = null;
+    });
+  }
+
+  void _saveEdit() {
+    final String name = _nameInput.text.trim();
+    final String goal = _goalInput.text.trim();
+    final int? hours = int.tryParse(_hoursInput.text.trim());
+    final int? minutes = int.tryParse(_minutesInput.text.trim());
+    setState(() {
+      if (name.isEmpty) {
+        _formError = 'Name cannot be empty.';
+        return;
+      }
+      if (hours == null ||
+          minutes == null ||
+          hours < 0 ||
+          hours > 24 ||
+          minutes < 0 ||
+          minutes > 59 ||
+          (hours == 0 && minutes == 0)) {
+        _formError = 'Enter a valid daily target (0–24 hrs, 0–59 min).';
+        return;
+      }
+      _appState.setProfile(
+        name: name,
+        examGoal: goal.isEmpty ? null : goal,
+        dailyTargetMinutes: hours * 60 + minutes,
+      );
+      _editing = false;
+      _formError = null;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,16 +94,29 @@ class ProfileScreen extends StatelessWidget {
         const SizedBox(height: 24),
         _profileCard(context, scheme),
         const SizedBox(height: 18),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            Padding(
-              padding: EdgeInsets.only(bottom: 10),
-              child: _statCard(context, scheme, 'Exam Goal', 'SSC CGL 2027'),
-            ),
-            _statCard(context, scheme, 'Daily Target', '3 hrs / day'),
-          ],
-        ),
+        if (_editing)
+          _editForm(context, scheme)
+        else
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              Padding(
+                padding: EdgeInsets.only(bottom: 10),
+                child: _statCard(
+                  context,
+                  scheme,
+                  'Exam Goal',
+                  _appState.examGoal,
+                ),
+              ),
+              _statCard(
+                context,
+                scheme,
+                'Daily Target',
+                '${FocusFlowAppState.formatMinutes(_appState.dailyTargetMinutes)} / day',
+              ),
+            ],
+          ),
         const SizedBox(height: 26),
         _sectionTitle(context, 'Settings'),
         const SizedBox(height: 14),
@@ -44,6 +126,109 @@ class ProfileScreen extends StatelessWidget {
             child: _settingRow(context, scheme, row),
           ),
       ],
+    );
+  }
+
+  Widget _editForm(BuildContext context, ColorScheme scheme) {
+    return Card.filled(
+      margin: EdgeInsets.zero,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(FocusFlowTheme.radiusL),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 18),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            Text(
+              'Edit Profile',
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                color: scheme.onSurface,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            const SizedBox(height: 6),
+            TextField(
+              controller: _nameInput,
+              maxLines: 1,
+              decoration: const InputDecoration(hintText: 'Your name'),
+            ),
+            const SizedBox(height: 10),
+            TextField(
+              controller: _goalInput,
+              maxLines: 1,
+              decoration: const InputDecoration(
+                hintText: 'Exam goal, e.g. SSC CGL 2027',
+              ),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              'Daily study target',
+              style: Theme.of(
+                context,
+              ).textTheme.labelLarge?.copyWith(color: scheme.onSurfaceVariant),
+            ),
+            const SizedBox(height: 6),
+            Row(
+              children: <Widget>[
+                Flexible(
+                  child: SizedBox(
+                    height: 56,
+                    child: TextField(
+                      controller: _hoursInput,
+                      maxLines: 1,
+                      decoration: const InputDecoration(
+                        hintText: 'Hours (0–24)',
+                        labelText: 'Hours',
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Flexible(
+                  child: SizedBox(
+                    height: 56,
+                    child: TextField(
+                      controller: _minutesInput,
+                      maxLines: 1,
+                      decoration: const InputDecoration(
+                        hintText: 'Minutes (0–59)',
+                        labelText: 'Minutes',
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            if (_formError != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: Text(
+                  _formError!,
+                  style: TextStyle(
+                    color: scheme.error,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                TextButton(onPressed: _cancelEdit, child: const Text('Cancel')),
+                FilledButton(
+                  onPressed: _saveEdit,
+                  child: const Text(
+                    'Save',
+                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -87,7 +272,7 @@ class ProfileScreen extends StatelessWidget {
               ),
               child: Center(
                 child: Text(
-                  'U',
+                  _appState.userName.substring(0, 1).toUpperCase(),
                   style: TextStyle(
                     color: scheme.onPrimary,
                     fontSize: 24,
@@ -102,7 +287,7 @@ class ProfileScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Text(
-                    'Udit',
+                    _appState.userName,
                     style: TextStyle(
                       color: scheme.onSurface,
                       fontSize: 18,
@@ -111,7 +296,7 @@ class ProfileScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 3),
                   Text(
-                    'Aspirant · SSC CGL 2027',
+                    'Aspirant · ${_appState.examGoal}',
                     style: TextStyle(
                       color: scheme.onSurfaceVariant,
                       fontSize: 14,
@@ -123,7 +308,7 @@ class ProfileScreen extends StatelessWidget {
             IconButton(
               icon: Icon(Icons.edit, color: scheme.onSurfaceVariant),
               tooltip: 'Edit profile',
-              onPressed: () {},
+              onPressed: _openEdit,
             ),
           ],
         ),
